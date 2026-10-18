@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Streamlit secrets (nunca versionar)
+.streamlit/secrets.toml
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ATENÇÃO: dados/ NÃO é ignorado — o snapshot Parquet é o conteúdo do deploy.

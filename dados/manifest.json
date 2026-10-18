@@ -1,0 +1,264 @@
+{
+ "versao": 1,
+ "gerado_em": "2026-10-18T14:33:44",
+ "origem": "snapshot Parquet congelado - Dados Abertos da Camara",
+ "contagens": {
+  "total": 661514,
+  "com_texto": 513648,
+  "linhas_transcricao": 544865,
+  "por_legislatura": {
+   "49": 54411,
+   "50": 62238,
+   "51": 66319,
+   "52": 84664,
+   "53": 92447,
+   "54": 86930,
+   "55": 94619,
+   "56": 68160,
+   "57": 51726
+  }
+ },
+ "arquivos": [
+  {
+   "nome": "catalogo_L49.parquet",
+   "tipo": "catalogo",
+   "legislatura": 49,
+   "linhas": 54411,
+   "min_id": 51418,
+   "max_id": 105850,
+   "bytes": 3080275,
+   "sha256": "2a1650a76d4a0471b7fe9f410ae3624099401adbb1b56850051177cd55e02368"
+  },
+  {
+   "nome": "catalogo_L50.parquet",
+   "tipo": "catalogo",
+   "legislatura": 50,
+   "linhas": 62238,
+   "min_id": 105851,
+   "max_id": 168114,
+   "bytes": 2991357,
+   "sha256": "b44599b3442551bb644dd8e15f7761e3f2becc6c372e542f716073ba7789e36d"
+  },
+  {
+   "nome": "catalogo_L51.parquet",
+   "tipo": "catalogo",
+   "legislatura": 51,
+   "linhas": 66319,
+   "min_id": 168115,
+   "max_id": 736953,
+   "bytes": 3168549,
+   "sha256": "87909ea22af7b34898dfb00420c2f18f112506429ad7a8ec19fcf4a268ccab22"
+  },
+  {
+   "nome": "catalogo_L52.parquet",
+   "tipo": "catalogo",
+   "legislatura": 52,
+   "linhas": 84664,
+   "min_id": 234002,
+   "max_id": 738905,
+   "bytes": 4061089,
+   "sha256": "e3a63147ae9ab7c674578db2f8783dd79b70b9f8ccc99682f723db4eead26485"
+  },
+  {
+   "nome": "catalogo_L53.parquet",
+   "tipo": "catalogo",
+   "legislatura": 53,
+   "linhas": 92447,
+   "min_id": 314413,
+   "max_id": 694221,
+   "bytes": 4025782,
+   "sha256": "edc2b6c4ac4dce5c5fe6dbb5731e06b49278c20606488743146bad1b18667537"
+  },
+  {
+   "nome": "catalogo_L54.parquet",
+   "tipo": "catalogo",
+   "legislatura": 54,
+   "linhas": 86930,
+   "min_id": 406475,
+   "max_id": 695210,
+   "bytes": 4255457,
+   "sha256": "d2414c83b99f57e97eff95cfc83156906badc3853b3e99bff69080d759c0adb7"
+  },
+  {
+   "nome": "catalogo_L55.parquet",
+   "tipo": "catalogo",
+   "legislatura": 55,
+   "linhas": 94619,
+   "min_id": 493548,
+   "max_id": 737284,
+   "bytes": 3747469,
+   "sha256": "430213f0c4678fb7716c4fda8a9dc07d43b259dfb77156ede5292c635e572cfa"
+  },
+  {
+   "nome": "catalogo_L56.parquet",
+   "tipo": "catalogo",
+   "legislatura": 56,
+   "linhas": 68160,
+   "min_id": 550742,
+   "max_id": 618901,
+   "bytes": 2813603,
+   "sha256": "f2cdd330172951bb4b18353bfdfdaeed9ff460cbbd3ebe600d95a06d04072206"
+  },
+  {
+   "nome": "catalogo_L57.parquet",
+   "tipo": "catalogo",
+   "legislatura": 57,
+   "linhas": 51726,
+   "min_id": 618902,
+   "max_id": 738572,
+   "bytes": 3839513,
+   "sha256": "718f9b96d241d6d9932bf8bdc612fb5255f7b851788ea66f12e767fbd67b8855"
+  },
+  {
+   "nome": "transcricoes_L51_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 51,
+   "linhas": 66319,
+   "min_id": 168115,
+   "max_id": 736953,
+   "bytes": 38341718,
+   "sha256": "81b1c11c4f76f28248f62706708af4b87a713e283bf725c8f83089af42570167"
+  },
+  {
+   "nome": "transcricoes_L52_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 52,
+   "linhas": 40000,
+   "min_id": 234002,
+   "max_id": 276434,
+   "bytes": 37570925,
+   "sha256": "c88df1be299609f546d441dcbb3b5ce868b81843316a728b9dfc4ce160245fea"
+  },
+  {
+   "nome": "transcricoes_L52_p02.parquet",
+   "tipo": "transcricao",
+   "legislatura": 52,
+   "linhas": 40000,
+   "min_id": 276435,
+   "max_id": 688163,
+   "bytes": 36094835,
+   "sha256": "2bdc7506ba1693043751611c5145f1cf43cf491d73b5c8b111a9322e2151e25b"
+  },
+  {
+   "nome": "transcricoes_L52_p03.parquet",
+   "tipo": "transcricao",
+   "legislatura": 52,
+   "linhas": 4664,
+   "min_id": 688164,
+   "max_id": 738905,
+   "bytes": 3827894,
+   "sha256": "b047ec9c4b2e4e21c31f804d460c0e80ad8fb8023cb8a4f02d51b4b3104ecfc7"
+  },
+  {
+   "nome": "transcricoes_L53_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 53,
+   "linhas": 80000,
+   "min_id": 314413,
+   "max_id": 395912,
+   "bytes": 64691697,
+   "sha256": "89c5223472ebf752c24c52b15d24bab2e7ada81401dd1ebc8d92745cdad157d3"
+  },
+  {
+   "nome": "transcricoes_L53_p02.parquet",
+   "tipo": "transcricao",
+   "legislatura": 53,
+   "linhas": 12447,
+   "min_id": 395913,
+   "max_id": 694221,
+   "bytes": 10740723,
+   "sha256": "29bb2fd6da3568acfd05e0264c3489d7b83cd8382cd6e8179764d56f1378195b"
+  },
+  {
+   "nome": "transcricoes_L54_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 54,
+   "linhas": 80000,
+   "min_id": 406475,
+   "max_id": 487591,
+   "bytes": 67155597,
+   "sha256": "f9123fed58e4346a2084b448abdace3cea0eb5cc5c6f136e52e4fd319a2e6e45"
+  },
+  {
+   "nome": "transcricoes_L54_p02.parquet",
+   "tipo": "transcricao",
+   "legislatura": 54,
+   "linhas": 6930,
+   "min_id": 487592,
+   "max_id": 695210,
+   "bytes": 5249201,
+   "sha256": "f8cc3b0e550c558df713d418f7716fc21495b91d617ca612ebbb313c62238f9a"
+  },
+  {
+   "nome": "transcricoes_L55_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 55,
+   "linhas": 94619,
+   "min_id": 493548,
+   "max_id": 737284,
+   "bytes": 60995826,
+   "sha256": "154174d747e39654880df9fd3efbd7e211274d77b446b4d8c5972daec2b05841"
+  },
+  {
+   "nome": "transcricoes_L56_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 56,
+   "linhas": 68160,
+   "min_id": 550742,
+   "max_id": 618901,
+   "bytes": 38463249,
+   "sha256": "7df3a7cbb40cbe8e3b878b64e1d2b56cbff65c17828c78496a8544c2d24bf254"
+  },
+  {
+   "nome": "transcricoes_L57_p01.parquet",
+   "tipo": "transcricao",
+   "legislatura": 57,
+   "linhas": 51726,
+   "min_id": 618902,
+   "max_id": 738572,
+   "bytes": 33477892,
+   "sha256": "78e10b2b02dff7e4a4bf7b033a6d2f5c4addb59041c1507b0f3741a729ffdc0e"
+  },
+  {
+   "nome": "metadados.parquet",
+   "tipo": "metadados",
+   "legislatura": null,
+   "linhas": 114,
+   "min_id": null,
+   "max_id": null,
+   "bytes": 8444,
+   "sha256": "a84acf48e6bade2cfd6e1e09a58122114e0ecbb0c05795a7d73067f441484418"
+  }
+ ],
+ "validacoes": {
+  "ok": true,
+  "erros": [],
+  "catalogo_total": 661514,
+  "total_banco": 661514,
+  "por_legislatura": {
+   "49": 54411,
+   "50": 62238,
+   "51": 66319,
+   "52": 84664,
+   "53": 92447,
+   "54": 86930,
+   "55": 94619,
+   "56": 68160,
+   "57": 51726
+  },
+  "com_texto": 513648,
+  "com_texto_esperado": 513648,
+  "linhas_transcricao": 544865,
+  "cobertura_idpartido": {
+   "com_partido": 659570,
+   "total": 661514,
+   "percentual": 99.706
+  },
+  "todos_abaixo_100mb": true,
+  "maior_arquivo_bytes": 67155597,
+  "maior_transcricao_bytes": 67155597,
+  "utf8_amostra_ok": true
+ },
+ "bytes_totais": 428601095,
+ "segundos_exportacao": 1749.1
+}
