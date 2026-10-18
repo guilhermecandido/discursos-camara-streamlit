@@ -267,40 +267,48 @@ def ir_para_pagina(max_pag: int):
 
 
 def navegacao(total: int, pagina: int, max_pag: int, offset: int, tamanho: int):
-    """Paginação abaixo da tabela: tudo em uma única linha de controles."""
-    esquerda, campo, info, direita = st.columns(
-        [1, 0.8, 2.4, 1], vertical_alignment="bottom")
-    esquerda.button(
-        "◀ Anterior",
-        disabled=pagina <= 1,
-        on_click=lambda: st.session_state.update(
-            f_pagina=max(1, st.session_state["f_pagina"] - 1)),
-        width="stretch",
-    )
+    """Paginação abaixo da tabela: uma linha centralizada de controles."""
     primeiro = min(offset + 1, total) if total else 0
     ultimo = min(offset + tamanho, total)
 
-    # Mantém o campo alinhado quando a página muda por Anterior/Próxima.
+    # Mantém o campo sincronizado quando a página muda por Anterior/Próxima.
     if st.session_state.get("f_pagina_input") != str(pagina):
         st.session_state["f_pagina_input"] = str(pagina)
-    campo.text_input(
-        "Página",
-        key="f_pagina_input",
-        on_change=ir_para_pagina,
-        args=(max_pag,),
-    )
-    info.caption(
-        f"de {max_pag:,} · {primeiro:,}–{ultimo:,} de {total:,}"
-        .replace(",", ".")
-    )
 
-    direita.button(
-        "Próxima ▶",
-        disabled=pagina >= max_pag,
-        on_click=lambda: st.session_state.update(
-            f_pagina=min(max_pag, st.session_state["f_pagina"] + 1)),
-        width="stretch",
-    )
+    with st.container(
+        horizontal=True,
+        horizontal_alignment="center",
+        vertical_alignment="center",
+        gap="medium",
+    ):
+        st.button(
+            "◀ Anterior",
+            disabled=pagina <= 1,
+            on_click=lambda: st.session_state.update(
+                f_pagina=max(1, st.session_state["f_pagina"] - 1)),
+            width=240,
+        )
+        st.caption("Página", width="content")
+        st.text_input(
+            "Página",
+            key="f_pagina_input",
+            label_visibility="collapsed",
+            on_change=ir_para_pagina,
+            args=(max_pag,),
+            width=64,
+        )
+        st.caption(
+            f"de {max_pag:,} · {primeiro:,}–{ultimo:,} de {total:,}"
+            .replace(",", "."),
+            width="content",
+        )
+        st.button(
+            "Próxima ▶",
+            disabled=pagina >= max_pag,
+            on_click=lambda: st.session_state.update(
+                f_pagina=min(max_pag, st.session_state["f_pagina"] + 1)),
+            width=240,
+        )
 
 
 if secao == "Discursos":
