@@ -204,7 +204,7 @@ def resumo_filtros() -> str:
 
 secao = st.radio(
     "Seção",
-    ["Discursos", "Agregados", "Cobertura", "Sobre"],
+    ["Discursos", "Agregados", "Cobertura"],
     horizontal=True,
     label_visibility="collapsed",
 )
@@ -267,8 +267,9 @@ def ir_para_pagina(max_pag: int):
 
 
 def navegacao(total: int, pagina: int, max_pag: int, offset: int, tamanho: int):
-    """Paginação abaixo da tabela: Anterior/Próxima + página editável inline."""
-    esquerda, centro, direita = st.columns([1, 4, 1], vertical_alignment="center")
+    """Paginação abaixo da tabela: tudo em uma única linha de controles."""
+    esquerda, campo, info, direita = st.columns(
+        [1, 0.8, 2.4, 1], vertical_alignment="bottom")
     esquerda.button(
         "◀ Anterior",
         disabled=pagina <= 1,
@@ -279,21 +280,19 @@ def navegacao(total: int, pagina: int, max_pag: int, offset: int, tamanho: int):
     primeiro = min(offset + 1, total) if total else 0
     ultimo = min(offset + tamanho, total)
 
-    with centro:
-        # Mantém o campo alinhado quando a página muda por Anterior/Próxima.
-        if st.session_state.get("f_pagina_input") != str(pagina):
-            st.session_state["f_pagina_input"] = str(pagina)
-        c1, c2 = st.columns([1, 3], vertical_alignment="bottom")
-        c1.text_input(
-            "Página",
-            key="f_pagina_input",
-            on_change=ir_para_pagina,
-            args=(max_pag,),
-        )
-        c2.caption(
-            f"de {max_pag:,} · {primeiro:,}–{ultimo:,} de {total:,}"
-            .replace(",", ".")
-        )
+    # Mantém o campo alinhado quando a página muda por Anterior/Próxima.
+    if st.session_state.get("f_pagina_input") != str(pagina):
+        st.session_state["f_pagina_input"] = str(pagina)
+    campo.text_input(
+        "Página",
+        key="f_pagina_input",
+        on_change=ir_para_pagina,
+        args=(max_pag,),
+    )
+    info.caption(
+        f"de {max_pag:,} · {primeiro:,}–{ultimo:,} de {total:,}"
+        .replace(",", ".")
+    )
 
     direita.button(
         "Próxima ▶",
@@ -453,68 +452,3 @@ elif secao == "Cobertura":
     fig.update_xaxes(type="category")
     fig.update_yaxes(range=[0, 100])
     st.plotly_chart(fig, width="stretch")
-
-elif secao == "Sobre":
-    st.subheader("Semântica dos dados")
-    st.markdown(
-        """
-- **Partido registrado na legislatura**: `discurso.idPartido` vem do registro
-  de partido por (deputado × legislatura) em `filiacao` (evento "Partido no
-  início da legislatura" do `/historico`). Inclui titulares e suplentes; em
-  legislaturas encerradas reflete o último partido do deputado na legislatura.
-- **NULL** significa apenas que não há registro para o par
-  (deputado × legislatura) na API.
-- A interface apenas lê `discurso.idPartido` já carimbado; não recalcula
-  partido a partir de `filiacao`.
-- Filtro por deputado: nome (contém) ou ID numérico exato.
-- Datas referem-se a `dataHoraInicio`; o dia final é incluído.
-- A coluna **Fonte** é o link para a página original da Câmara; o **texto
-  integral** é a transcrição exibida no detalhe do discurso.
-        """
-    )
-    st.subheader("Arquitetura e desempenho")
-    gerado = data.gerado_em()
-    gerado_txt = f"{gerado:%d/%m/%Y}" if gerado else "data indisponível"
-    total_txt = f"{len(catalogo.df):,}".replace(",", ".")
-    st.markdown(
-        f"""
-- **Base de dados congelada em Parquet** (gerada em {gerado_txt}): catálogos
-  por legislatura, transcrições em blocos e metadados pequenos.
-- O catálogo de {total_txt} discursos (sumário truncado em 400
-  caracteres, sem transcrição) é carregado **uma vez** e mantido em memória.
-- Filtros, ordenação, paginação e agregados rodam em memória; o detalhe lê
-  apenas o bloco de transcrição da legislatura do discurso.
-        """
-    )
-    st.subheader("Limitações conhecidas")
-    st.markdown(
-        """
-- **29 pares** (deputado × legislatura) sem registro na API, concentrados nas
-  49ª/50ª; os discursos desses pares ficam com `idPartido` NULL. Veja a seção
-  **Cobertura** para os números atuais.
-- **157 registros** de discurso irrecuperáveis por HTTP 500 da API (0,024%) e
-  **1 par** (deputado 160666/55ª) sem resposta; não afetam as consultas.
-- **6 nomes** de deputado NULL apenas em legislaturas fora do escopo 49ª–57ª.
-- **49ª e 50ª não têm transcrição na fonte**: o detalhe mostra "Sem
-  transcrição" e o sumário **truncado em 400 caracteres**.
-- **31.217 discursos** de 51ª–57ª têm transcrição vazia na origem; o detalhe
-  mostra o sumário e as palavras-chave.
-- A base de dados é **congelada**: mudanças na fonte só aparecem após gerar e
-  publicar uma nova base de dados.
-        """
-    )
-    st.subheader("Como atualizar")
-    st.markdown(
-        "A base de dados é regenerada a partir da fonte oficial e publicada "
-        "como um novo commit; o app reinicia com os dados novos:"
-    )
-    st.code(
-        "# 1) exportação  -> gera dados/ (Parquet + manifest)\n"
-        "# 2) conferência -> contagens, hashes e smoke test\n"
-        "# 3) publicação  -> commit/push; o Streamlit Cloud reinicia",
-        language="text",
-    )
-    st.caption(
-        "A base de dados é a fonte de verdade do app; não há atualização em "
-        "tempo de execução."
-    )
