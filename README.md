@@ -4,6 +4,8 @@ Aplicação **somente leitura** (Streamlit) para explorar 661.514 discursos das
 49ª–57ª legislaturas (1991–2027), coletados da API de Dados Abertos da Câmara
 dos Deputados.
 
+**App:** https://discursos-parlamentares.streamlit.app/
+
 Este repositório é **independente**: contém apenas o aplicativo e um
 **snapshot congelado em Parquet**. Não há scripts de coleta, credenciais nem
 serviço de dados — o app lê os arquivos de `dados/` diretamente.
