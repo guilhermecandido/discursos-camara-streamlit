@@ -1,6 +1,6 @@
 """Interface Streamlit de exploração dos discursos parlamentares (somente leitura).
 
-Lê o snapshot Parquet em `dados/` (ou em `DADOS_DIR`):
+Lê a base de dados Parquet em `dados/` (ou em `DADOS_DIR`):
     streamlit run web/app.py
 """
 
@@ -17,14 +17,13 @@ import data  # noqa: E402
 
 st.set_page_config(
     page_title="Discursos Parlamentares — Câmara dos Deputados",
-    page_icon="🏛️",
     layout="wide",
 )
 
 
 @st.cache_resource(show_spinner=False)
 def carregar_catalogo():
-    """Catálogo em memória (uma carga por processo)."""
+    """Catálogo em memória (uma leitura por processo)."""
     return data.carregar_catalogo()
 
 
@@ -63,10 +62,11 @@ rotulo_partido = {
 }
 tipos_disponiveis = sorted(catalogo.df["tipoDiscurso"].dropna().unique())
 
+SEM_PARTIDO = 0  # sentinela do multiselect: converte em incluir_sem_partido
+
 DEFAULTS = {
     "f_legs": [57],
     "f_partidos": [],
-    "f_sem_partido": False,
     "f_datas": (inicio, fim),
     "f_deputado": "",
     "f_tipo_on": False,
@@ -86,37 +86,40 @@ def limpar_filtros():
 
 st.title("Discursos Parlamentares — Câmara dos Deputados")
 st.caption(
-    "Partido registrado na legislatura (deputado × legislatura); NULL apenas "
-    "quando não há registro para o par. Fonte: Dados Abertos da Câmara, "
-    "49ª–57ª legislaturas."
+    "Pesquisa de TCC sobre discursos de deputados federais, 49ª–57ª "
+    "legislaturas (1991–2027). Fonte: Dados Abertos da Câmara."
 )
 
 with st.sidebar:
     st.header("Filtros")
 
     legislaturas_sel = st.multiselect(
-        "Legislatura(s)",
+        "Legislaturas",
         options=legislaturas.idLegislatura.tolist(),
         format_func=lambda x: rotulo_leg.get(x, str(x)),
         key="f_legs",
-        help="Padrão: 57ª. Selecione outras para ampliar o período.",
+        placeholder="Selecione uma ou mais legislaturas",
+        select_all=False,
+        filter_mode="fuzzy",
     )
 
     partidos_sel = st.multiselect(
-        "Partido(s)",
-        options=partidos.idPartido.tolist(),
-        format_func=lambda x: rotulo_partido.get(x, str(x)),
+        "Partidos",
+        options=[SEM_PARTIDO, *partidos.idPartido.tolist()],
+        format_func=lambda x: (
+            "Sem partido" if x == SEM_PARTIDO else rotulo_partido.get(x, str(x))),
         key="f_partidos",
-        help="Vazio = todos os partidos. A semântica é 'partido registrado na legislatura'.",
+        placeholder="Selecione um ou mais partidos",
+        select_all=False,
+        filter_mode="fuzzy",
     )
-    st.checkbox("Incluir 'Sem partido'", key="f_sem_partido")
 
     datas = st.date_input(
         "Intervalo de datas",
         min_value=inicio,
         max_value=fim,
         key="f_datas",
-        help="Filtra dataHoraInicio; o dia final é incluído.",
+        help="Inclui o dia final.",
     )
 
     st.text_input(
@@ -127,18 +130,25 @@ with st.sidebar:
 
     st.checkbox("Filtrar por tipo de discurso", key="f_tipo_on")
     if st.session_state["f_tipo_on"]:
-        st.multiselect("Tipo(s) de discurso", options=tipos_disponiveis, key="f_tipos")
+        st.multiselect(
+            "Tipos de discurso",
+            options=tipos_disponiveis,
+            key="f_tipos",
+            placeholder="Selecione um ou mais tipos",
+            select_all=False,
+            filter_mode="fuzzy",
+        )
 
     st.divider()
     gerado = data.gerado_em()
     gerado_txt = f"{gerado:%d/%m/%Y}" if gerado else "data indisponível"
-    st.caption(
-        f"Snapshot de {gerado_txt} · {len(catalogo.df):,} discursos · "
-        f"carga {catalogo.segundos:.1f} s".replace(",", ".")
+    faixa_leg = (
+        f"{int(legislaturas.idLegislatura.min())}ª–"
+        f"{int(legislaturas.idLegislatura.max())}ª"
     )
     st.caption(
-        "Somente leitura. Snapshot congelado: os dados não mudam enquanto "
-        "o app estiver no ar."
+        f"Dados até {gerado_txt} · {len(catalogo.df):,} discursos · {faixa_leg}"
+        .replace(",", ".")
     )
 
 if isinstance(datas, (tuple, list)) and len(datas) == 2:
@@ -148,10 +158,12 @@ elif isinstance(datas, (tuple, list)) and len(datas) == 1:
 else:
     data_inicio, data_fim = inicio, fim
 
+partidos_sel = [p for p in partidos_sel if p != SEM_PARTIDO]
+
 filtros = data.Filtros(
     legislaturas=tuple(legislaturas_sel),
     partidos=tuple(partidos_sel),
-    incluir_sem_partido=st.session_state["f_sem_partido"],
+    incluir_sem_partido=SEM_PARTIDO in st.session_state["f_partidos"],
     data_inicio=data_inicio,
     data_fim=data_fim,
     deputado=st.session_state["f_deputado"],
@@ -174,11 +186,11 @@ def resumo_filtros() -> str:
     partes = []
     if filtros.legislaturas:
         partes.append("Leg.: " + ", ".join(f"{x}ª" for x in sorted(filtros.legislaturas)))
-    if filtros.partidos:
-        partes.append("Partido: " + ", ".join(
-            sigla_partido.get(x, str(x)) for x in filtros.partidos))
+    nomes_partido = [sigla_partido.get(x, str(x)) for x in filtros.partidos]
     if filtros.incluir_sem_partido:
-        partes.append("+ Sem partido")
+        nomes_partido.append("Sem partido")
+    if nomes_partido:
+        partes.append("Partido: " + ", ".join(nomes_partido))
     if (filtros.data_inicio and filtros.data_fim
             and (filtros.data_inicio, filtros.data_fim) != (inicio, fim)):
         partes.append(
@@ -271,22 +283,16 @@ def navegacao(total: int, pagina: int, max_pag: int, offset: int, tamanho: int):
         # Mantém o campo alinhado quando a página muda por Anterior/Próxima.
         if st.session_state.get("f_pagina_input") != str(pagina):
             st.session_state["f_pagina_input"] = str(pagina)
-        c1, c2, c3 = st.columns([1, 1, 3], vertical_alignment="center")
-        c1.markdown(
-            "<div style='text-align:right'>Página</div>",
-            unsafe_allow_html=True,
-        )
-        c2.text_input(
+        c1, c2 = st.columns([1, 3], vertical_alignment="bottom")
+        c1.text_input(
             "Página",
             key="f_pagina_input",
-            label_visibility="collapsed",
             on_change=ir_para_pagina,
             args=(max_pag,),
         )
-        c3.markdown(
-            f"de <b>{max_pag}</b> · {primeiro:,}–{ultimo:,} de {total:,}"
-            .replace(",", "."),
-            unsafe_allow_html=True,
+        c2.caption(
+            f"de {max_pag:,} · {primeiro:,}–{ultimo:,} de {total:,}"
+            .replace(",", ".")
         )
 
     direita.button(
@@ -391,7 +397,7 @@ elif secao == "Agregados":
                               coloraxis_showscale=False, height=520)
             st.plotly_chart(fig, width="stretch")
         with col2:
-            st.subheader("Top deputados")
+            st.subheader("Deputados com mais discursos")
             fig = px.bar(
                 dados["deputados"], x="discursos", y="deputado", orientation="h",
                 labels={"discursos": "Discursos", "deputado": "Deputado"},
@@ -421,7 +427,7 @@ elif secao == "Cobertura":
 
     st.subheader("Cobertura de idPartido por legislatura")
     st.caption(
-        "Indicador do snapshot carregado. NULL = par (deputado × legislatura) "
+        "Indicador da base de dados carregada. NULL = par (deputado × legislatura) "
         "sem registro na API; o método inclui titulares e suplentes em todas as "
         "legislaturas (49ª–57ª)."
     )
@@ -469,16 +475,16 @@ elif secao == "Sobre":
     st.subheader("Arquitetura e desempenho")
     gerado = data.gerado_em()
     gerado_txt = f"{gerado:%d/%m/%Y}" if gerado else "data indisponível"
+    total_txt = f"{len(catalogo.df):,}".replace(",", ".")
     st.markdown(
         f"""
-- **Snapshot congelado em Parquet** (gerado em {gerado_txt}): catálogos por
-  legislatura, transcrições em blocos e metadados pequenos.
-- O catálogo de {len(catalogo.df):,} discursos (sumário truncado em 400
+- **Base de dados congelada em Parquet** (gerada em {gerado_txt}): catálogos
+  por legislatura, transcrições em blocos e metadados pequenos.
+- O catálogo de {total_txt} discursos (sumário truncado em 400
   caracteres, sem transcrição) é carregado **uma vez** e mantido em memória.
 - Filtros, ordenação, paginação e agregados rodam em memória; o detalhe lê
   apenas o bloco de transcrição da legislatura do discurso.
-- Estado atual: carga em **{catalogo.segundos:.1f} s**.
-        """.replace(",", ".")
+        """
     )
     st.subheader("Limitações conhecidas")
     st.markdown(
@@ -493,14 +499,14 @@ elif secao == "Sobre":
   transcrição" e o sumário **truncado em 400 caracteres**.
 - **31.217 discursos** de 51ª–57ª têm transcrição vazia na origem; o detalhe
   mostra o sumário e as palavras-chave.
-- O snapshot é **congelado**: mudanças na fonte só aparecem após gerar e
-  publicar um novo snapshot.
+- A base de dados é **congelada**: mudanças na fonte só aparecem após gerar e
+  publicar uma nova base de dados.
         """
     )
     st.subheader("Como atualizar")
     st.markdown(
-        "O snapshot é regenerado a partir da fonte oficial e publicado como um "
-        "novo commit; o app reinicia com os dados novos:"
+        "A base de dados é regenerada a partir da fonte oficial e publicada "
+        "como um novo commit; o app reinicia com os dados novos:"
     )
     st.code(
         "# 1) exportação  -> gera dados/ (Parquet + manifest)\n"
@@ -509,6 +515,6 @@ elif secao == "Sobre":
         language="text",
     )
     st.caption(
-        "O snapshot é a fonte de verdade do app; não há atualização em tempo "
-        "de execução."
+        "A base de dados é a fonte de verdade do app; não há atualização em "
+        "tempo de execução."
     )

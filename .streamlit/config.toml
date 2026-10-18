@@ -4,9 +4,16 @@ headless = true
 [browser]
 gatherUsageStats = false
 
-[theme]
-base = "light"
+# Sem theme.base: o app segue o tema do sistema (menu nativo: Sistema/Claro/Escuro).
+[theme.light]
 primaryColor = "#2E5A88"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F5F7FA"
 textColor = "#1F2933"
+
+[theme.dark]
+primaryColor = "#3E7CB1"
+backgroundColor = "#0E1117"
+secondaryBackgroundColor = "#161B22"
+textColor = "#E6EDF3"
+borderColor = "#30363D"
