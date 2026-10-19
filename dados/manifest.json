@@ -16,7 +16,9 @@
    "55": 94619,
    "56": 68160,
    "57": 51726
-  }
+  },
+  "postings": 12762494,
+  "vocabulario": 62492
  },
  "arquivos": [
   {
@@ -228,6 +230,106 @@
    "max_id": null,
    "bytes": 8444,
    "sha256": "a84acf48e6bade2cfd6e1e09a58122114e0ecbb0c05795a7d73067f441484418"
+  },
+  {
+   "nome": "temas.parquet",
+   "tipo": "temas",
+   "legislatura": null,
+   "linhas": 661514,
+   "min_id": 51418,
+   "max_id": 738905,
+   "bytes": 42505654,
+   "sha256": "04dd51b09557fd88355aa0eb20a58e2326023001c048bbfa91a160561dfb393a"
+  },
+  {
+   "nome": "indice_L49.parquet",
+   "tipo": "indice",
+   "legislatura": 49,
+   "linhas": 809275,
+   "min_id": 51418,
+   "max_id": 105850,
+   "bytes": 2230642,
+   "sha256": "b0d8781609971511aff6ecb8d9758f0f6a2019e66bcd4cb58950d78642fd33a9"
+  },
+  {
+   "nome": "indice_L50.parquet",
+   "tipo": "indice",
+   "legislatura": 50,
+   "linhas": 1596835,
+   "min_id": 105851,
+   "max_id": 168114,
+   "bytes": 4373704,
+   "sha256": "4edbb75343ade5111b8139604af4e16afa14495867850597c56316b9677faee1"
+  },
+  {
+   "nome": "indice_L51.parquet",
+   "tipo": "indice",
+   "legislatura": 51,
+   "linhas": 1198778,
+   "min_id": 168115,
+   "max_id": 736953,
+   "bytes": 3301296,
+   "sha256": "2c194a36f985a62c40f8b96cdfb85f1b0f3f43bb9dc9d7d98f65b0a7d488abad"
+  },
+  {
+   "nome": "indice_L52.parquet",
+   "tipo": "indice",
+   "legislatura": 52,
+   "linhas": 1516195,
+   "min_id": 234002,
+   "max_id": 738905,
+   "bytes": 4405511,
+   "sha256": "9199f76fdde3c3854d21d22cffe2b0e6638956028b0f526da930e764f898d6f2"
+  },
+  {
+   "nome": "indice_L53.parquet",
+   "tipo": "indice",
+   "legislatura": 53,
+   "linhas": 1944644,
+   "min_id": 314413,
+   "max_id": 694221,
+   "bytes": 5637786,
+   "sha256": "4fc3dbb87e5bd2e77b0a28892a208939d5eff065551c0521c9936062502b1635"
+  },
+  {
+   "nome": "indice_L54.parquet",
+   "tipo": "indice",
+   "legislatura": 54,
+   "linhas": 1738303,
+   "min_id": 406475,
+   "max_id": 695210,
+   "bytes": 5062203,
+   "sha256": "304ee7e5725aaaedeca24a3979c890d1646d8cf043053e666d9f3e8579f1182a"
+  },
+  {
+   "nome": "indice_L55.parquet",
+   "tipo": "indice",
+   "legislatura": 55,
+   "linhas": 1721466,
+   "min_id": 493548,
+   "max_id": 737284,
+   "bytes": 5022279,
+   "sha256": "39a060431dc1db373bb11016dee7a02211abcd35cc9d32895f9e7d882ca69b08"
+  },
+  {
+   "nome": "indice_L56.parquet",
+   "tipo": "indice",
+   "legislatura": 56,
+   "linhas": 1392945,
+   "min_id": 550742,
+   "max_id": 618901,
+   "bytes": 3780491,
+   "sha256": "c067241c76d81e6f6880fc8bd6921ffcfa613442504d1a506697d6c6db3de4a8"
+  },
+  {
+   "nome": "indice_L57.parquet",
+   "tipo": "indice",
+   "legislatura": 57,
+   "linhas": 844053,
+   "min_id": 618902,
+   "max_id": 738572,
+   "bytes": 2234815,
+   "sha256": "56892b10889adc5d4932ca05b3923dad7154c387033f2698693012c9ddcd323f"
   }
  ],
  "validacoes": {
@@ -257,8 +359,11 @@
   "todos_abaixo_100mb": true,
   "maior_arquivo_bytes": 67155597,
   "maior_transcricao_bytes": 67155597,
-  "utf8_amostra_ok": true
+  "utf8_amostra_ok": true,
+  "temas": 661514,
+  "postings": 12762494,
+  "vocabulario": 62492
  },
- "bytes_totais": 428601095,
+ "bytes_totais": 507155476,
  "segundos_exportacao": 1749.1
 }

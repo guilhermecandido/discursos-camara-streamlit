@@ -13,12 +13,27 @@ serviço de dados — o app lê os arquivos de `dados/` diretamente.
 ## Estrutura
 
 ```
-dados/                snapshot Parquet (catálogos, transcrições, metadados, manifest)
+dados/                snapshot Parquet (catálogos, transcrições, temas, índices, manifest)
 web/app.py            interface Streamlit
 web/data.py           leitura do snapshot Parquet
 requirements.txt      dependências pinadas
 .streamlit/config.toml
 ```
+
+## Busca temática
+
+Acima da tabela (abas **Discursos** e **Agregados**), a busca aplica-se ao
+conjunto já filtrado:
+
+- termos separados são combinados com **E**; `"frase exata"` entre aspas;
+  acentos e maiúsculas são ignorados; não há OR, negação nem curingas;
+- por padrão, busca em **temas** (palavras-chave e sumário);
+- **Incluir texto integral** estende a busca à transcrição, disponível apenas
+  na 51ª–57ª (pode levar alguns segundos; há progresso por bloco);
+- Enter ou **Buscar** aplicam a consulta; **Limpar busca** volta ao conjunto
+  filtrado;
+- durante a busca, a coluna **Sumário** vira **Trecho**, com o trecho do match
+  (texto integral, palavra-chave ou sumário), sem criar coluna nova.
 
 ## Rodar localmente
 
@@ -31,11 +46,14 @@ Abra o endereço exibido no terminal (porta padrão 8501).
 
 ## Snapshot
 
-- 21 arquivos, **428,6 MB** (compressão zstd):
+- 31 arquivos, **~507 MB** (compressão zstd):
   - 9 catálogos (`catalogo_L49.parquet` … `catalogo_L57.parquet`) com data,
     deputado, partido, legislatura, tipo, sumário (400 caracteres) e link;
   - 11 blocos de transcrição (`transcricoes_L51_*.parquet` … `L57_*`) com
     texto integral, palavras-chave e sumário;
+  - `temas.parquet` (palavras-chave originais e normalizadas por discurso) e
+    9 índices invertidos `indice_L49.parquet` … `indice_L57.parquet`
+    (termo → discurso; 12,76 milhões de postings, 62.492 termos);
   - `metadados.parquet` (legislaturas, partidos, período) e `manifest.json`
     (contagens, faixas de id, tamanhos e sha256).
 - 661.514 discursos; **513.648** com transcrição; cobertura de partido
@@ -56,6 +74,9 @@ Os textos são de domínio público; a atribuição à fonte é obrigatória.
   discursos com `idPartido` NULL.
 - 157 registros irrecuperáveis (HTTP 500 da API) e 1 par sem resposta.
 - 6 nomes de deputado NULL apenas em legislaturas fora do escopo.
+- A busca por temas depende das palavras-chave da fonte (variações e ruído) e
+  do sumário truncado em 400 caracteres; frases que cruzam esse corte não
+  casam. O texto integral cobre só a 51ª–57ª.
 - O snapshot é congelado: atualizações exigem gerar e publicar um novo
   snapshot (novo commit); não há atualização em tempo de execução.
 
