@@ -1,3 +1,4 @@
+# Dependencias pinadas (interface publica)
 streamlit==1.63.0
 plotly==7.0.0
 pandas==3.0.5
