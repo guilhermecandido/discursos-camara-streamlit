@@ -564,11 +564,18 @@ def _posicao_id(cat: Catalogo, id_discurso: int) -> int | None:
     return int(cat.ordem[i])
 
 
-def detalhar(id_discurso: int):
-    """Linha completa (metadados do catálogo + texto do bloco da legislatura)."""
-    cat = _catalogo
+def detalhar(id_discurso: int, cat: "Catalogo | None" = None):
+    """Linha completa (metadados do catálogo + texto do bloco da legislatura).
+
+    `cat` é o catálogo do processo que chama (parâmetro explícito). O global
+    `_catalogo` fica só como compatibilidade: com `st.cache_resource` um cache
+    hit pode devolver o catálogo sem executar `carregar_catalogo()`, deixando o
+    global vazio.
+    """
+    cat = cat if cat is not None else _catalogo
     if cat is None:
-        raise RuntimeError("Catálogo não carregado: chame carregar_catalogo().")
+        raise RuntimeError(
+            "Catálogo não carregado: chame carregar_catalogo() ou passe `cat`.")
     posicao = _posicao_id(cat, id_discurso)
     if posicao is None:
         return None

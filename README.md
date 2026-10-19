@@ -28,12 +28,13 @@ conjunto já filtrado:
 - termos separados são combinados com **E**; `"frase exata"` entre aspas;
   acentos e maiúsculas são ignorados; não há OR, negação nem curingas;
 - por padrão, busca em **temas** (palavras-chave e sumário);
-- **Incluir texto integral** estende a busca à transcrição, disponível apenas
-  na 51ª–57ª (pode levar alguns segundos; há progresso por bloco);
-- Enter ou **Buscar** aplicam a consulta; **Limpar busca** volta ao conjunto
+- **Texto integral** estende a busca à transcrição, disponível apenas na
+  51ª–57ª (pode levar alguns segundos; há progresso por bloco);
+- Enter ou **Buscar** aplicam a consulta; **Limpar** volta ao conjunto
   filtrado;
-- durante a busca, a coluna **Sumário** vira **Trecho**, com o trecho do match
-  (texto integral, palavra-chave ou sumário), sem criar coluna nova.
+- a coluna **Sumário** vira **Trecho** somente na busca com texto integral; a
+  busca por tema mantém **Sumário**. O trecho vem do texto integral, da
+  palavra-chave ou do sumário, sem criar coluna nova.
 
 ## Rodar localmente
 

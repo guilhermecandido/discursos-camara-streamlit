@@ -43,8 +43,9 @@ def cached_periodo():
 
 
 @st.cache_data(show_spinner=False)
-def cached_detalhe(id_discurso: int):
-    return data.detalhar(id_discurso)
+def cached_detalhe(id_discurso: int, _catalogo):
+    """Detalhe por id; o catálogo vai explícito (parâmetro `_` não entra no hash)."""
+    return data.detalhar(id_discurso, _catalogo)
 
 
 with st.spinner("Carregando catálogo de discursos..."):
@@ -239,17 +240,23 @@ secao = st.radio(
 
 
 def campo_busca():
-    """Formulário de busca compartilhado (Enter e botão)."""
-    coluna_form, coluna_limpar = st.columns([6.2, 1.3], vertical_alignment="bottom")
+    """Formulário de busca compartilhado (Enter e botão), em uma linha."""
+    coluna_form, coluna_limpar = st.columns(
+        [7.7, 0.6], vertical_alignment="center")
     with coluna_form:
         with st.form("busca", border=False, enter_to_submit=True):
-            c1, c2, c3 = st.columns([4.4, 3.5, 1.5], vertical_alignment="bottom")
+            c1, c2, c3 = st.columns(
+                [5.6, 1.8, 1.25], vertical_alignment="center", gap="small")
             with c1:
                 texto = st.text_input(
                     "Buscar nos discursos",
                     type="search",
                     icon=":material/search:",
-                    placeholder='ex.: previdência ou "reforma da previdência"',
+                    label_visibility="collapsed",
+                    placeholder=(
+                        'Buscar nos discursos — ex.: previdência ou '
+                        '"reforma da previdência"'
+                    ),
                     help=(
                         "Termos separados são combinados com E. Use aspas para "
                         "uma expressão exata. Acentos e maiúsculas são ignorados. "
@@ -259,16 +266,20 @@ def campo_busca():
                 )
             with c2:
                 incluir_texto = st.checkbox(
-                    "Incluir texto integral (51ª–57ª)",
+                    "Texto integral",
                     key="f_busca_texto_input",
                     help=(
-                        "Busca também na transcrição. Disponível apenas para "
-                        "51ª–57ª; pode levar alguns segundos."
+                        "Busca também na transcrição (51ª–57ª). Pode levar "
+                        "alguns segundos."
                     ),
                 )
             with c3:
                 enviar = st.form_submit_button(
-                    "Buscar", icon=":material/search:", width="stretch")
+                    "Buscar",
+                    icon=":material/search:",
+                    type="secondary",
+                    width="content",
+                )
 
     if enviar:
         st.session_state["f_busca"] = (texto or "").strip()
@@ -277,22 +288,21 @@ def campo_busca():
 
     with coluna_limpar:
         st.button(
-            "Limpar busca",
+            "Limpar",
             on_click=limpar_busca,
             disabled=not st.session_state["f_busca"],
-            width="stretch",
+            type="tertiary",
+            width="content",
         )
 
 
 def linha_aviso(resultado, incluir_texto: bool):
-    """Slot de altura fixa abaixo da busca (aviso 49ª/50ª)."""
+    """Aviso 49ª/50ª (renderizado apenas quando existe)."""
     if incluir_texto and resultado is not None and resultado.aviso_49_50:
         st.caption(
             "Texto integral disponível apenas na 51ª–57ª; a 49ª e a 50ª "
             "ficam fora desta busca."
         )
-    else:
-        st.caption(" ")
 
 
 def obter_busca(texto: str, incluir_texto: bool, legislaturas_sel):
@@ -399,19 +409,22 @@ def navegacao(total: int, pagina: int, max_pag: int, offset: int, tamanho: int):
         )
 
 
-def exibir_detalhe(id_discurso):
-    discurso = cached_detalhe(id_discurso)
+def exibir_detalhe(id_discurso, cat):
+    discurso = cached_detalhe(id_discurso, _catalogo=cat)
     if discurso is None:
         st.warning("Discurso não encontrado.")
         return
     partido = discurso.partido
     if partido is None or (isinstance(partido, float) and pd.isna(partido)):
         partido = "Sem partido"
+    tipo = discurso.tipoDiscurso
+    if not (isinstance(tipo, str) and tipo.strip()):
+        tipo = "tipo não informado"
     st.subheader(f"{discurso.deputado} — {partido}")
     st.caption(
         f"{discurso.dataHoraInicio:%d/%m/%Y %H:%M} · "
         f"{int(discurso.idLegislatura)}ª legislatura · "
-        f"{discurso.tipoDiscurso or 'tipo não informado'}"
+        f"{tipo}"
     )
     if discurso.transcricao:
         with st.expander("Transcrição (texto integral)", expanded=True):
@@ -424,29 +437,30 @@ def exibir_detalhe(id_discurso):
     if discurso.keywords:
         st.markdown("**Palavras-chave**")
         st.write(discurso.keywords)
-    if discurso.urlTexto:
+    url = discurso.urlTexto
+    if isinstance(url, str) and url.strip():
         st.caption("Fonte externa (página da Câmara):")
-        st.link_button("Abrir fonte na Câmara", discurso.urlTexto)
+        st.link_button("Abrir fonte na Câmara", url)
 
 
 def exibicao_tabela(df: pd.DataFrame, trechos: dict[int, str],
-                    busca_ativa: bool) -> pd.DataFrame:
-    valores = (df.sumario.fillna("") if not busca_ativa else
-               pd.Series([trechos.get(int(i), "") for i in df.idDiscurso],
-                         index=df.index, dtype=object))
+                    usar_trecho: bool) -> pd.DataFrame:
+    valores = (pd.Series([trechos.get(int(i), "") for i in df.idDiscurso],
+                         index=df.index, dtype=object)
+               if usar_trecho else df.sumario.fillna(""))
     return pd.DataFrame({
         "Data": pd.to_datetime(df.dataHoraInicio).dt.strftime("%d/%m/%Y %H:%M"),
         "Deputado": df.deputado,
         "Partido": df.partido.fillna("Sem partido"),
         "Leg.": df.idLegislatura,
         "Tipo": df.tipoDiscurso.fillna(""),
-        "Sumário" if not busca_ativa else "Trecho": valores.fillna(""),
+        "Trecho" if usar_trecho else "Sumário": valores.fillna(""),
         "Fonte": df.urlTexto.fillna(""),
     })
 
 
-def configuracao_colunas(busca_ativa: bool) -> dict:
-    rotulo = "Trecho" if busca_ativa else "Sumário"
+def configuracao_colunas(usar_trecho: bool) -> dict:
+    rotulo = "Trecho" if usar_trecho else "Sumário"
     return {
         "Data": st.column_config.TextColumn("Data", width="small"),
         "Deputado": st.column_config.TextColumn("Deputado", width="medium"),
@@ -490,9 +504,10 @@ def secao_discursos():
     offset = (pagina - 1) * tamanho
 
     df = data.montar_pagina(catalogo, posicoes, offset, tamanho)
+    usar_trecho = busca_ativa and incluir_texto
     trechos = (data.trechos_pagina(catalogo, df.idDiscurso, resultado)
-               if busca_ativa else {})
-    exibicao = exibicao_tabela(df, trechos, busca_ativa)
+               if usar_trecho else {})
+    exibicao = exibicao_tabela(df, trechos, usar_trecho)
 
     chave_busca = abs(hash((busca, incluir_texto))) % 100000
     evento = st.dataframe(
@@ -503,7 +518,7 @@ def secao_discursos():
         on_select="rerun",
         selection_mode="single-row",
         key=f"tabela_{pagina}_{chave_curta}_{chave_busca}",
-        column_config=configuracao_colunas(busca_ativa),
+        column_config=configuracao_colunas(usar_trecho),
     )
 
     navegacao(total, pagina, max_pag, offset, tamanho)
@@ -524,7 +539,7 @@ def secao_discursos():
                 "o sumário e as palavras-chave."
             )
         else:
-            exibir_detalhe(int(df.iloc[indice].idDiscurso))
+            exibir_detalhe(int(df.iloc[indice].idDiscurso), catalogo)
 
     st.download_button(
         "Baixar esta página (CSV)",
